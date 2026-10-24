@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Organizer • WhatsApp Folder Contacts Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <div class="desktop-container">
+    <!-- Simulator Sidebar / Controls -->
+    <aside class="control-panel">
+      <div class="panel-header">
+        <span class="badge">Level 3: Power User Engine</span>
+        <h2>File Organizer</h2>
+        <p class="subtitle">Folders visually disguised as WhatsApp contacts. Controlled via <code>folders_config.json</code>.</p>
+      </div>
+
+      <!-- Level 3: AI Text to .md feature -->
+      <div class="action-card highlight-card">
+        <h3>🤖 AI Text to .md Document</h3>
+        <p>Paste copied text from ChatGPT / Claude / Gemini into your chats as a formatted <code>.md</code> file:</p>
+        <button class="btn btn-primary" onclick="triggerAiPasteSimulation()">📋 Paste Sample AI Response as .md</button>
+      </div>
+
+      <div class="action-card">
+        <h3>📲 OS Share Menu Intercept</h3>
+        <p>Simulate sharing a file from Chrome, Gallery, Files, or WhatsApp into this app:</p>
+        
+        <div class="file-drop-zone" id="dropZone">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span>Drag & Drop any file here</span>
+          <span class="sub-text">or choose a quick sample below:</span>
+          <input type="file" id="fileInput" style="display:none" />
+        </div>
+
+        <div class="sample-btn-group">
+          <button class="btn btn-secondary" onclick="simulatePresetShare('Tax_Invoice_2026.pdf', 340000, 'pdf')">🧾 Tax Invoice (PDF)</button>
+          <button class="btn btn-secondary" onclick="simulatePresetShare('Quarterly_Report.docx', 1250000, 'doc')">💼 Report (DOCX)</button>
+          <button class="btn btn-secondary" onclick="simulatePresetShare('Family_Holiday.jpg', 4200000, 'img')">📸 Vacation (JPG)</button>
+        </div>
+      </div>
+
+      <!-- Level 3 Requirement 4: PC Access & Migration -->
+      <div class="action-card">
+        <h3>💻 PC File Access & Cloud Sync</h3>
+        <p>Access all folders, files & .md documents from your PC:</p>
+        <div class="btn-grid">
+          <button class="btn btn-accent" onclick="openPcAccessModal()">🖥️ How to Access Files from PC</button>
+          <button class="btn btn-secondary" onclick="openConfigModal()">⚙️ folders_config.json</button>
+          <button class="btn btn-secondary" onclick="exportBackupPackage()">📦 Export Backup Package (.fo_backup)</button>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h4>🎯 Level 4 Features Enforced:</h4>
+        <ul class="checklist">
+          <li><span class="chk">✓</span> <strong>Central Search:</strong> Global search across all chats with location & pinned badges</li>
+          <li><span class="chk">✓</span> <strong>Media & Docs Browser:</strong> 3-dots filter for Media, Docs, and AI Notes</li>
+          <li><span class="chk">✓</span> <strong>Default App Opener:</strong> Opens files via native system apps (open_filex)</li>
+          <li><span class="chk">✓</span> <strong>AI Text to .md:</strong> Formats & saves copied text as markdown with reader</li>
+          <li><span class="chk">✓</span> <strong>Google Drive Cloud:</strong> Transparent account & path in My Drive</li>
+        </ul>
+      </div>
+
+      <div class="theme-switch-row">
+        <span>Dark / Light Mode:</span>
+        <button class="btn-theme" onclick="toggleTheme()" id="themeBtn">🌙 WhatsApp Dark</button>
+      </div>
+    </aside>
+
+    <!-- Mobile Device Frame -->
+    <main class="phone-wrapper">
+      <div class="phone-frame">
+        <div class="phone-notch">
+          <span class="phone-time">15:15</span>
+          <div class="notch-lens"></div>
+          <div class="phone-icons">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 21l3.52-.61C9.36 20.73 10.64 21 12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+          </div>
+        </div>
+
+        <div class="phone-content" id="phoneApp">
+          <!-- Main App Screen (Contacts List) -->
+          <div class="screen active" id="homeScreen">
+            <header class="app-header">
+              <div class="header-top">
+                <h1 class="brand-title">File Organizer</h1>
+                <div class="header-actions">
+                  <button class="icon-btn" onclick="openCentralSearchModal()" title="Central Search across all chats">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </button>
+                  <button class="icon-btn" onclick="openCreateFolderModal()" title="Add folder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                  <button class="icon-btn" onclick="triggerManualShare()" title="Share Intent"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+                  <button class="icon-btn" onclick="openConfigModal()" title="Config"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+                </div>
+              </div>
+              <nav class="whatsapp-tabs">
+                <div class="tab-item active" onclick="switchMainTab('folders')">FOLDERS</div>
+                <div class="tab-item" onclick="switchMainTab('recent')">RECENT FILES</div>
+                <div class="tab-item" onclick="switchMainTab('pc_access')">PC ACCESS</div>
+              </nav>
+            </header>
+
+            <div class="notice-bar" onclick="document.getElementById('prototypeStorageInput').click()">
+              <span>📁 Tap to pick files from storage to sort into folders</span>
+              <input type="file" id="prototypeStorageInput" style="display:none" onchange="handlePrototypeStorageFile(event)" />
+            </div>
+
+            <!-- Flat List of WhatsApp Contact Folders -->
+            <div class="contact-list" id="foldersList">
+              <!-- Dynamically populated from JS -->
+            </div>
+
+            <button class="whatsapp-fab" onclick="openCreateFolderModal()" title="Add New Folder Contact">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+
+          <!-- Folder Conversation / Chat View -->
+          <div class="screen" id="chatScreen">
+            <header class="chat-header">
+              <button class="back-btn" onclick="closeChat()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              </button>
+              <div class="chat-avatar" id="chatAvatar">💼</div>
+              <div class="chat-meta">
+                <h3 id="chatTitle">Work Documents</h3>
+                <span id="chatSubtitle">3 items • Active folder</span>
+              </div>
+              <div class="header-actions">
+                <button class="icon-btn" title="Paste AI Text as .md" onclick="openAiPasteModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="16" y2="15"/></svg></button>
+                <button class="icon-btn" title="Media, docs & notes" onclick="openChatMediaModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+                <button class="icon-btn" onclick="openFolderOptions()"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+              </div>
+            </header>
+
+            <!-- Pinned Messages Banner -->
+            <div class="pinned-banner" id="pinnedBanner" style="display:none;">
+              <span class="pin-icon">📌</span>
+              <span class="pinned-text" id="pinnedText">Pinned: Document.md</span>
+              <button class="pinned-action" onclick="openCurrentPinnedFile()">OPEN</button>
+              <button class="pinned-close" onclick="unpinCurrentFile()">✕</button>
+            </div>
+
+            <div class="chat-thread-container">
+              <div class="system-bubble">Files organized as conversational messages • Tap .md files to read</div>
+              <div class="messages-list" id="chatMessages">
+                <!-- Dynamically populated files -->
+              </div>
+            </div>
+
+            <footer class="chat-input-bar">
+              <button class="icon-btn" title="Paste AI Text as .md" onclick="openAiPasteModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00A884" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="16" y2="15"/></svg></button>
+              <input type="text" placeholder="Add note or paste AI text..." id="noteInput" onkeydown="handleNoteKey(event)">
+              <button class="send-round-btn" onclick="addNoteFromInput()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </footer>
+          </div>
+
+          <!-- Share Target Overlay (Modal Bottom Sheet) -->
+          <div class="share-overlay-sheet" id="shareOverlay">
+            <div class="overlay-handle"></div>
+            <header class="overlay-header">
+              <button class="close-overlay-btn" onclick="closeShareOverlay()">✕</button>
+              <div>
+                <h2>Send to...</h2>
+                <p id="shareOverlaySubtitle">Select or create a Folder Contact</p>
+              </div>
+            </header>
+
+            <!-- Intercepted File Preview Card -->
+            <div class="intercepted-file-card" id="interceptedCard">
+              <div class="file-icon-box" id="interceptedIconBox">📄</div>
+              <div class="file-meta">
+                <div class="badge-tag" id="interceptedBadge">INTERCEPTED FILE</div>
+                <div class="file-name" id="interceptedName">Document.pdf</div>
+                <div class="file-details" id="interceptedSize">1.2 MB • PDF</div>
+              </div>
+            </div>
+
+            <!-- Level 5 (v1.3): Tagging & Caption Box -->
+            <div class="share-caption-tag-box">
+              <div class="share-caption-row">
+                <span class="icon-prefix">✏️</span>
+                <input type="text" id="shareCaptionInput" placeholder="Add a caption... (enables future search)" />
+              </div>
+              <hr />
+              <div class="share-tag-row">
+                <span class="icon-prefix">#</span>
+                <input type="text" id="shareTagInput" placeholder="Add tag (e.g. #receipt, #taxes)" onkeydown="handleTagKey(event)" />
+                <button class="btn-tag-add" onclick="addTagFromInput()">Add</button>
+              </div>
+              <div class="share-tags-chips" id="shareTagsChips"></div>
+            </div>
+
+            <!-- Quick '+ New Folder Contact' Row right inside Share Sheet -->
+            <div class="add-folder-share-row" onclick="openCreateFolderModal(true)">
+              <div class="add-icon-circle">+</div>
+              <div class="add-text">
+                <div class="add-title">New Folder Contact</div>
+                <div class="add-subtitle">Create a new folder for this file</div>
+              </div>
+            </div>
+
+            <div class="section-label">SELECT DESTINATION FOLDER</div>
+
+            <div class="overlay-contacts-list" id="overlayContacts">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div class="overlay-fab-container" id="sendBtnContainer">
+              <button class="whatsapp-send-fab" id="confirmSendBtn" onclick="confirmSendFile()">
+                <span id="sendBtnLabel">Save to Folder</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Create Folder Modal -->
+          <div class="modal-backdrop" id="createFolderModal">
+            <div class="modal-card">
+              <div class="modal-header">
+                <h3>Create Folder Contact</h3>
+                <button class="close-modal-btn" onclick="closeCreateFolderModal()">✕</button>
+              </div>
+              <div class="modal-body">
+                <label>Folder Name</label>
+                <input type="text" id="newFolderName" placeholder="e.g. Electric Vehicle, Project Alpha" />
+
+                <label>Description (optional)</label>
+                <input type="text" id="newFolderDesc" placeholder="e.g. Invoices, documents, notes" />
+
+                <label>Choose Avatar Icon</label>
+                <div class="emoji-picker-grid" id="emojiPicker"></div>
+
+                <label>Choose Color</label>
+                <div class="color-picker-row" id="colorPicker"></div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCreateFolderModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitNewFolder()">Create Folder</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Text Paste Modal (Level 3 Item 1) -->
+          <div class="modal-backdrop" id="aiPasteModal">
+            <div class="modal-card modal-wide">
+              <div class="modal-header">
+                <h3>🤖 Save AI Text as .md</h3>
+                <button class="close-modal-btn" onclick="closeAiPasteModal()">✕</button>
+              </div>
+              <div class="modal-body">
+                <p class="config-desc">Paste copied AI output from ChatGPT / Claude / Gemini to automatically save as a Markdown (.md) note:</p>
+                <label>Document Title</label>
+                <input type="text" id="aiDocTitle" placeholder="e.g. System_Design_Architecture" />
+                <label>Markdown Content</label>
+                <textarea id="aiDocContent" rows="6" placeholder="# Paste your AI response here..."></textarea>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAiPasteModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitAiMarkdownDoc()">Save .md Document</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Markdown Reader Modal (Level 3 Item 1) -->
+          <div class="modal-backdrop" id="markdownReaderModal">
+            <div class="modal-card modal-wide md-reader-card">
+              <div class="modal-header">
+                <div class="md-reader-title-box">
+                  <span class="md-badge">MD</span>
+                  <h3 id="mdReaderTitle">Document.md</h3>
+                </div>
+                <button class="close-modal-btn" onclick="closeMarkdownReader()">✕</button>
+              </div>
+              <div class="modal-body md-reader-content" id="mdReaderBody">
+                <!-- Rendered Markdown HTML -->
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="copyMarkdownContent()">📋 Copy Markdown</button>
+                <button class="btn btn-primary" onclick="closeMarkdownReader()">Done</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PC File Access Guide Modal (Level 3 Item 4) -->
+          <div class="modal-backdrop" id="pcAccessModal">
+            <div class="modal-card modal-wide">
+              <div class="modal-header">
+                <h3>🖥️ Access Files on Your PC</h3>
+                <button class="close-modal-btn" onclick="closePcAccessModal()">✕</button>
+              </div>
+              <div class="modal-body pc-guide-body">
+                <div class="pc-method-card">
+                  <h4>Method 1: Direct USB Cable (Fastest)</h4>
+                  <p>1. Plug your phone into your PC with a USB cable.</p>
+                  <p>2. Open Windows File Explorer → <code>This PC\[Your Phone]\Internal Storage\Documents\FileOrganizer\</code></p>
+                  <p>3. You will see every folder as a regular Windows folder with all files and <code>.md</code> notes ready to open!</p>
+                </div>
+
+                <div class="pc-method-card">
+                  <h4>Method 2: Google Drive Web</h4>
+                  <p>1. In the app, tap <strong>Sync with Google Drive</strong>.</p>
+                  <p>2. On your PC, open <code>drive.google.com</code>.</p>
+                  <p>3. Access the <code>FileOrganizer</code> folder to view, download, or edit files.</p>
+                </div>
+
+                <div class="pc-method-card">
+                  <h4>Method 3: Standalone Backup Package</h4>
+                  <p>1. Tap <strong>Export Backup Package</strong>.</p>
+                  <p>2. Send the <code>.fo_backup</code> file to your PC via WhatsApp Web or email.</p>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closePcAccessModal()">Got It</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Config JSON Modal -->
+          <div class="modal-backdrop" id="configJsonModal">
+            <div class="modal-card modal-wide">
+              <div class="modal-header">
+                <h3>folders_config.json</h3>
+                <button class="close-modal-btn" onclick="closeConfigModal()">✕</button>
+              </div>
+              <div class="modal-body">
+                <p class="config-desc">User-controlled configuration file. All folders, icons, and colors are defined here and saved across devices.</p>
+                <textarea id="configJsonText" rows="12"></textarea>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeConfigModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveConfigFromJsonText()">Save & Apply</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Central Search Modal (Level 4 Item 4) -->
+          <div class="modal-backdrop" id="centralSearchModal">
+            <div class="modal-card modal-wide modal-search">
+              <div class="modal-header">
+                <div class="search-input-wrap">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" id="centralSearchInput" placeholder="Search all files, notes, chats..." oninput="handleCentralSearch()">
+                </div>
+                <button class="close-modal-btn" onclick="closeCentralSearchModal()">✕</button>
+              </div>
+              <div class="search-filter-pills">
+                <button class="pill active" onclick="setCentralSearchFilter('All', this)">All</button>
+                <button class="pill" onclick="setCentralSearchFilter('Docs', this)">Docs</button>
+                <button class="pill" onclick="setCentralSearchFilter('Media', this)">Media</button>
+                <button class="pill" onclick="setCentralSearchFilter('Notes', this)">AI Notes</button>
+                <button class="pill" onclick="setCentralSearchFilter('Pinned', this)">📌 Pinned</button>
+              </div>
+              <div class="search-results-stats" id="searchResultsStats">Search across all chats</div>
+              <div class="modal-body search-results-body" id="centralSearchResults">
+                <!-- Dynamically populated results -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Media, Docs & Notes Modal (Level 4 Item 5) -->
+          <div class="modal-backdrop" id="chatMediaModal">
+            <div class="modal-card modal-wide">
+              <div class="modal-header">
+                <div>
+                  <h3 id="chatMediaTitle">Media, Docs & Notes</h3>
+                  <p class="config-desc" id="chatMediaSubtitle">Filtered files in this folder</p>
+                </div>
+                <button class="close-modal-btn" onclick="closeChatMediaModal()">✕</button>
+              </div>
+              <div class="media-tabs-nav">
+                <button class="media-tab active" id="tabMediaBtn" onclick="switchMediaTab('media')">MEDIA (0)</button>
+                <button class="media-tab" id="tabDocsBtn" onclick="switchMediaTab('docs')">DOCS (0)</button>
+                <button class="media-tab" id="tabNotesBtn" onclick="switchMediaTab('notes')">AI NOTES (0)</button>
+              </div>
+              <div class="modal-body media-tab-content" id="chatMediaContent">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- File Opener Android System App Chooser Modal (Level 5 Item 8) -->
+          <div class="modal-backdrop" id="fileOpenerModal">
+            <div class="modal-card">
+              <div class="modal-header">
+                <div>
+                  <h3 id="fileOpenerTitle">Open with...</h3>
+                  <p class="config-desc" id="fileOpenerMeta">Select viewer application</p>
+                </div>
+                <button class="close-modal-btn" onclick="closeFileOpenerModal()">✕</button>
+              </div>
+              <div class="modal-body text-center">
+                <div class="file-opener-icon-large" id="fileOpenerIcon">📄</div>
+                <h4 id="fileOpenerName">Document.pdf</h4>
+                <div class="app-chooser-list" id="appChooserList">
+                  <!-- Dynamically populated relevant apps -->
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="simulateAppOpen('Just once')">Just Once</button>
+                <button class="btn btn-primary" onclick="simulateAppOpen('Always')">Always</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- In-App Software Update Modal (Level 5 Item 2) -->
+          <div class="modal-backdrop" id="updateModal">
+            <div class="modal-card modal-wide">
+              <div class="modal-header">
+                <h3>🚀 Check for Updates (v1.3)</h3>
+                <button class="close-modal-btn" onclick="closeUpdateModal()">✕</button>
+              </div>
+              <div class="modal-body" id="updateModalBody">
+                <!-- Dynamically populated -->
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUpdateModal()">Close</button>
+                <button class="btn btn-primary" id="updateActionBtn" onclick="triggerUpdateAction()">Download APK (v1.3.0)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toast Notification -->
+          <div class="toast" id="toastMessage">✓ Saved to Work Documents</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

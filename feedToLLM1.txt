@@ -1,0 +1,81 @@
+level1:
+Based on your handwritten notes in the file "bc8fc3e6-6286-4ddb-a13a-f0ae8b0f2b0b", here is a phased blueprint designed to be fed into an AI assistant piece by piece to accommodate usage limits. The core concept is a mobile organizer app where users share files to folders that are presented visually as conversational "contacts," bypassing the friction of navigating nested sub-folders like in Google Drive.
+
+**Chunk 1: Project Setup & System Share Target (MVP Core)**
+
+* Request the AI to initialize the mobile app framework (e.g., Flutter or React Native).
+* Instruct it to implement the OS-level Share Extension (iOS) or Direct Share (Android) so the app registers as a target in the device's native share menu.
+
+
+* Ask for a basic UI overlay that intercepts the shared file and displays a hardcoded, flat list of 3-5 "Folders" styled identically to a WhatsApp contact list.
+
+
+
+**Chunk 2: File Handling & Local Storage (MVP Completion)**
+
+* Prompt the AI to write the logic for handling incoming file streams (images, text, documents) from the OS share menu.
+
+
+* Implement local device storage to save the intercepted file directly into the directory associated with the selected "Contact-Folder".
+
+
+* Build a simple in-app gallery view so you can open the app and verify the files are successfully sorted into their respective "contacts."
+
+**Chunk 3: Dynamic Folder Management (Post-MVP)**
+
+* Ask the AI to implement CRUD (Create, Read, Update, Delete) database operations for the folders.
+* Add a UI for the user to create new "contacts" (folders), assign them names, and give them profile pictures or avatars to strengthen the messaging app illusion.
+
+
+
+**Chunk 4: Cloud Sync & UI Polish (Post-MVP)**
+
+* Request integration with a backend service (Firebase, AWS, or Google Drive API) to backup the local folders to the cloud.
+* Add UI polish, such as search functionality to find specific files and visual animations that mimic sending a message when a file is successfully saved.
+
+
+
+
+
+
+
+
+
+level2:
+saw your prototype on http://localhost:8080; my views are below:
+a. I want this to work perfectly on my android mobile
+b. make sure if i change my mobile I can get back the whole experience and data in the new phone
+c. i want to easily add folder/chat heads when sharing a new file (presets are hard coded now; they should be in such a way that user can control via config files)
+d. never add any auto text to/as captions with 'files shared' 
+
+If you have any question/confusion ask me right away
+
+
+level3: 
+1. enable user to add copied text to the chats from ai and save/format them automatically as .md file (which can be read from the chat heads as well)
+2. pin messages/files
+3. forward from one chat to another
+4. how can I access these files and texts from my pc (its not necessary in the mvp level to be exactly rendered in like chats, file access is alright)
+
+
+level4:
+1. could we open those files from the app in the default file opener in the android?
+2. Understood this backs up into google drive but which account and where can I see those files 
+3. Prepare a maintain a "implementation, assumption, insturctions" file which will direct future llm agents to Build from scratch
+4. VERY IMPORTANT: implement a central search option ; this search should be able to show results from all the chats and should be able to show where it is located (like in which chat and whether pinned or not etc) 
+5. Just like whatsapp; enable users to only see media files, documents from each chat heads three dots.
+
+
+level5:
+1. each and every file share should allow a) tagging b) a caption that enables future search
+2. implement check for updates (but I dont know how to do that in github. it should be uploaded to MY github accoutn)
+3. I want a good icon for this app
+4. how to import everything from google drive
+5. It should be 100% clear or configurable; which google drive (out of n I have logged in) this app is using for uploading the data. 
+6. delete chatheads with all its contents, files and folders; 
+7. Important EDIT: The top menu equivalent to (SHARE NOW) in the prototype; should enable user to pick files from the storage
+8. Important EDIT2: When opening a file from the app; it suggests very few apps (may be the default app I meant previously means something else in the standard connotations); so I want to show all relevant apps for each file type that the user is trying to open.
+
+
+
+
