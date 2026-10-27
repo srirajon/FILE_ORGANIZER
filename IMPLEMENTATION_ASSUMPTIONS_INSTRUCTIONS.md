@@ -119,6 +119,10 @@ FileOrganizer/
    - **Which Account:** Android Google Play Services account selected by the user.
    - **Where Files Live in Google Drive:** Visible in the user's primary Google Drive at `My Drive > FileOrganizer / [FolderName] / [Files]`.
 
+6. **STRICT RULE — No Premature APK Compilation Without User Clearance:**
+   - **Never** compile or build `.apk` packages straight away before user testing and clearance.
+   - Always implement features, verify code correctness with `flutter analyze` and tests, and wait for the user's explicit verification and clearance before generating release `.apk` packages in any chat.
+
 ---
 
 ## 5. ⚠️ Environment Gotchas & Workarounds (Windows / Network Drive)
@@ -214,3 +218,8 @@ The output APK is generated at:
   5. **Delete Folder Contact with Contents:** Permanently remove folder contacts with optional physical storage file deletion from device.
   6. **In-App GitHub Update Checker:** Checks latest GitHub releases, shows version comparison, release notes, APK download link, and step-by-step guide to publishing APKs on GitHub.
   7. **Custom App Launcher Icon:** Beautiful glassmorphic teal/emerald launcher icon generated and deployed to Android mipmap densities (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`).
+- **Level 6 (v1.4 Facebook Text Look & Feel, Multi-File Sharing & Caption Editing):**
+  1. **Preserved Facebook Text Look & Feel:** Solved text flattening and loss of newlines when pasting posts from Facebook, browsers, or clipboards. Multiline text inputs (`maxLines: 6`), newline sanitization (normalizing `\r\n`, `\r`, `\u2028`, `\u2029` to `\n`), and dedicated conversational message bubbles with rich typography (`height: 1.45`), paragraph spacing, emojis, and checkmarks without ugly fake attachment boxes.
+  2. **Duplicate Folder Fix:** Fixed bug where creating a new folder during file sharing added duplicate entries to the contact list. Removed redundant list insertions and enforced singleton folder identity.
+  3. **Long-Press Caption & Note Editing:** Added contextual action on long-pressing any chathead file or message bubble to edit or add captions, modify text, and update `#tags` with instant persistence and live central search indexing.
+  4. **Multi-File Batch Sharing:** Full support for selecting and sharing multiple files simultaneously from Android OS Share target (`SEND_MULTIPLE`) and in-app file picker, featuring a multi-file preview carousel, aggregate size badges, and atomic batch persistence to the destination folder.

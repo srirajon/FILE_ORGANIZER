@@ -61,10 +61,17 @@ class FolderConfigService {
     required String avatarEmoji,
     required Color avatarBgColor,
   }) async {
+    final existingIndex = _folders.indexWhere(
+      (f) => f.name.trim().toLowerCase() == name.trim().toLowerCase(),
+    );
+    if (existingIndex != -1) {
+      return _folders[existingIndex];
+    }
+
     final newFolder = FolderContact(
       id: 'folder_${DateTime.now().millisecondsSinceEpoch}',
-      name: name,
-      description: description,
+      name: name.trim(),
+      description: description.trim(),
       avatarEmoji: avatarEmoji,
       avatarBgColor: avatarBgColor,
       lastTimestamp: 'Just now',

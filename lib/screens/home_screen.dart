@@ -38,6 +38,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     // Initialize Share Intent Service
     _shareService.initialize(
+      onIncomingFiles: (files) {
+        _openShareOverlayForFiles(files);
+      },
       onIncomingFile: (sharedFile) {
         _openShareOverlay(sharedFile);
       },
@@ -59,6 +62,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   void _openShareOverlay(SharedFileItem file) {
+    _openShareOverlayForFiles([file]);
+  }
+
+  void _openShareOverlayForFiles(List<SharedFileItem> files) {
+    if (files.isEmpty) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -69,11 +77,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           child: ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             child: ShareOverlayScreen(
-              initialFile: file,
+              initialFiles: files,
               folders: _folders,
               onDismiss: () {
                 Navigator.of(context).pop();
-                _shareService.clearPendingFile();
+                _shareService.clearPendingFiles();
                 setState(() {});
               },
             ),
@@ -91,7 +99,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       );
 
       if (files.isNotEmpty) {
-        for (final platformFile in files) {
+        final items = <SharedFileItem>[];
+        for (int i = 0; i < files.length; i++) {
+          final platformFile = files[i];
           if (platformFile.path != null) {
             int sizeBytes = platformFile.lengthSync() ?? 0;
             if (sizeBytes == 0) {
@@ -100,20 +110,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               } catch (_) {}
             }
             final category = SharedFileItem.detectCategory(platformFile.name, '');
-            final fileItem = SharedFileItem(
-              id: 'file_${DateTime.now().millisecondsSinceEpoch}_${platformFile.name.hashCode.abs()}',
-              fileName: platformFile.name,
-              filePath: platformFile.path,
-              fileSizeBytes: sizeBytes,
-              mimeType: 'application/octet-stream',
-              sharedAt: DateTime.now(),
-              category: category,
+            items.add(
+              SharedFileItem(
+                id: 'file_${DateTime.now().millisecondsSinceEpoch}_$i',
+                fileName: platformFile.name,
+                filePath: platformFile.path,
+                fileSizeBytes: sizeBytes,
+                mimeType: 'application/octet-stream',
+                sharedAt: DateTime.now(),
+                category: category,
+              ),
             );
-            if (mounted) {
-              _openShareOverlay(fileItem);
-            }
-            break;
           }
+        }
+        if (items.isNotEmpty && mounted) {
+          _openShareOverlayForFiles(items);
         }
       }
     } catch (e) {

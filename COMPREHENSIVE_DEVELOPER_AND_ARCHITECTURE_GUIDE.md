@@ -441,6 +441,12 @@ timeline
         : Option A Google Drive Share
         : In-App GitHub Update Checker
         : Custom Glassmorphic App Icon
+    section Level 6 (v1.4)
+        : Preserved Facebook Text Look & Feel
+        : Multiline Formatting & Newline Normalization
+        : Duplicate Folder Elimination
+        : Long-Press Caption & Tag Editing
+        : Multi-File Batch Share & Carousel Preview
 ```
 
 ---

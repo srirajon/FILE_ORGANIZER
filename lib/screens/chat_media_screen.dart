@@ -49,6 +49,7 @@ class _ChatMediaScreenState extends State<ChatMediaScreen> with SingleTickerProv
 
   List<SharedFileItem> get _docFiles {
     return _allFiles.where((f) {
+      if (f.isTextNote) return false;
       final matchesCategory = f.category == FileCategory.document ||
           f.category == FileCategory.archive ||
           f.category == FileCategory.audio ||
@@ -61,12 +62,13 @@ class _ChatMediaScreenState extends State<ChatMediaScreen> with SingleTickerProv
 
   List<SharedFileItem> get _noteFiles {
     return _allFiles.where((f) {
-      final matchesCategory = f.isMarkdown || f.category == FileCategory.markdown;
+      final matchesCategory = f.isMarkdown || f.category == FileCategory.markdown || f.isTextNote;
       if (!matchesCategory) return false;
       if (_searchFilter.isEmpty) return true;
       final inName = f.fileName.toLowerCase().contains(_searchFilter.toLowerCase());
       final inContent = f.rawContent?.toLowerCase().contains(_searchFilter.toLowerCase()) ?? false;
-      return inName || inContent;
+      final inCaption = f.displayCaption?.toLowerCase().contains(_searchFilter.toLowerCase()) ?? false;
+      return inName || inContent || inCaption;
     }).toList();
   }
 

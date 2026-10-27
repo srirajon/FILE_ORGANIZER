@@ -7,19 +7,39 @@
 ## 📱 Android Releases (Ready to Install)
 
 The newest compiled Android release package is ready in the workspace root:
-- 👉 **[`FileOrganizer_v1.3.apk`](file:///p:/Other%20computers/My%20Computer%20(2)/Raisul%20DESCO%20HR/Programming/Mobile%20App/FileOrganizer/FileOrganizer_v1.3.apk)** *(51.5 MB — Release APK with Real Physical File Vault & Google Drive Save)*
+- 👉 **[`FileOrganizer_v1.4.apk`](file:///c:/src/FileOrganizer/FileOrganizer_v1.4.apk)** *(51.6 MB — Release APK with Preserved Facebook Look & Feel, Multi-File Sharing & Long-Press Caption Editing)*
 
 > 📘 **For Future LLM Agents & Developers:** Refer to the master architecture and build guide:  
-> 👉 **[`IMPLEMENTATION_ASSUMPTIONS_INSTRUCTIONS.md`](file:///p:/Other%20computers/My%20Computer%20(2)/Raisul%20DESCO%20HR/Programming/Mobile%20App/FileOrganizer/IMPLEMENTATION_ASSUMPTIONS_INSTRUCTIONS.md)**  
+> 👉 **[`IMPLEMENTATION_ASSUMPTIONS_INSTRUCTIONS.md`](file:///c:/src/FileOrganizer/IMPLEMENTATION_ASSUMPTIONS_INSTRUCTIONS.md)**  
 > 🎓 **Master Educational Guide & Deep Architecture (NotebookLM Ready):**  
-> 👉 **[`COMPREHENSIVE_DEVELOPER_AND_ARCHITECTURE_GUIDE.md`](file:///p:/Other%20computers/My%20Computer%20(2)/Raisul%20DESCO%20HR/Programming/Mobile%20App/FileOrganizer/COMPREHENSIVE_DEVELOPER_AND_ARCHITECTURE_GUIDE.md)**  
+> 👉 **[`COMPREHENSIVE_DEVELOPER_AND_ARCHITECTURE_GUIDE.md`](file:///c:/src/FileOrganizer/COMPREHENSIVE_DEVELOPER_AND_ARCHITECTURE_GUIDE.md)**  
 > 📑 **System Explainer (What, Why, How & Backup Architecture):**  
-> 👉 **[`APP_OVERVIEW_WHAT_HOW_WHY.md`](file:///p:/Other%20computers/My%20Computer%20(2)/Raisul%20DESCO%20HR/Programming/Mobile%20App/FileOrganizer/APP_OVERVIEW_WHAT_HOW_WHY.md)**
+> 👉 **[`APP_OVERVIEW_WHAT_HOW_WHY.md`](file:///c:/src/FileOrganizer/APP_OVERVIEW_WHAT_HOW_WHY.md)**
 
 ### How to Install on Your Android Phone:
-1. Transfer `FileOrganizer_v1.3.apk` to your phone via USB cable, Google Drive, WhatsApp, or Bluetooth.
-2. Tap the APK file on your phone and choose **Install** (or **Update** if updating from v1.2 — your data will NOT be lost).
+1. Transfer `FileOrganizer_v1.4.apk` to your phone via USB cable, Google Drive, WhatsApp, or Bluetooth.
+2. Tap the APK file on your phone and choose **Install** (or **Update** if updating from v1.3 — your data will NOT be lost).
 3. Open the app or use Android's **Share** sheet to share any file, image, or document directly into your folder contacts!
+
+---
+
+## 🌟 Level 6 (v1.4) New Enhancements & Problem Solutions
+
+### 1. 💬 Preserved Facebook Text Look & Feel
+* Eliminates the single-line flattening bug when pasting copied posts from Facebook, browsers, or other apps.
+* Standardizes all line break formats (`\r\n`, `\r`, `\u2028`, `\u2029` to `\n`) and renders text messages as conversational WhatsApp-style message bubbles with natural paragraph spacing (`height: 1.45`), emoji support, timestamps, and double blue checkmarks (`✓✓`), without clunky fake attachment cards.
+
+### 2. 📁 Duplicate Folder Contact Fix
+* Resolved the bug where creating a new folder contact while sharing a file caused two identical folders to appear in the list.
+* Enforced singleton folder identity and eliminated redundant list insertions.
+
+### 3. ✏️ Long-Press to Edit / Add Caption & Tags
+* Long-press any file attachment or message bubble in any chathead to instantly open the **Edit / Add Caption** sheet.
+* Modify captions, edit text notes, and update `#tags` with live global search synchronization and instant local storage persistence.
+
+### 4. 📦 Multi-File Batch Sharing
+* Selecting multiple files in Android Gallery, Files app, or via the in-app storage file picker now shares ALL files simultaneously into the chosen folder contact.
+* Features a multi-file preview carousel, aggregate size badge, and atomic batch storage persistence.
 
 ---
 

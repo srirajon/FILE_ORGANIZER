@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import '../models/shared_file_item.dart';
@@ -12,13 +13,36 @@ class ShareIntentService {
   final _sharedPayloadController = StreamController<SharedFileItem>.broadcast();
   Stream<SharedFileItem> get onFileReceived => _sharedPayloadController.stream;
 
-  SharedFileItem? _latestPendingFile;
-  SharedFileItem? get latestPendingFile => _latestPendingFile;
+  final _sharedMultiplePayloadController = StreamController<List<SharedFileItem>>.broadcast();
+  Stream<List<SharedFileItem>> get onFilesReceived => _sharedMultiplePayloadController.stream;
 
-  void initialize({required Function(SharedFileItem) onIncomingFile}) {
+  List<SharedFileItem> _latestPendingFiles = [];
+  List<SharedFileItem> get latestPendingFiles => List.unmodifiable(_latestPendingFiles);
+
+  SharedFileItem? get latestPendingFile =>
+      _latestPendingFiles.isNotEmpty ? _latestPendingFiles.first : null;
+
+  void initialize({
+    Function(List<SharedFileItem>)? onIncomingFiles,
+    Function(SharedFileItem)? onIncomingFile,
+  }) {
+    _sharedMultiplePayloadController.stream.listen((files) {
+      _latestPendingFiles = files;
+      if (onIncomingFiles != null) {
+        onIncomingFiles(files);
+      }
+      if (files.isNotEmpty && onIncomingFile != null) {
+        onIncomingFile(files.first);
+      }
+    });
+
     _sharedPayloadController.stream.listen((file) {
-      _latestPendingFile = file;
-      onIncomingFile(file);
+      if (_latestPendingFiles.isEmpty) {
+        _latestPendingFiles = [file];
+      }
+      if (onIncomingFile != null) {
+        onIncomingFile(file);
+      }
     });
 
     if (!kIsWeb) {
@@ -49,36 +73,55 @@ class ShareIntentService {
 
   void _handleMediaFiles(List<SharedMediaFile> mediaFiles) {
     if (mediaFiles.isEmpty) return;
-    final file = mediaFiles.first;
 
-    // Check if this is incoming shared text or URL from an AI app/browser
-    if (file.type == SharedMediaType.text || file.type == SharedMediaType.url) {
-      if (file.path.trim().isNotEmpty) {
-        _handleIncomingText(file.path);
+    // Check if incoming is single shared text or URL
+    if (mediaFiles.length == 1 &&
+        (mediaFiles.first.type == SharedMediaType.text || mediaFiles.first.type == SharedMediaType.url)) {
+      if (mediaFiles.first.path.trim().isNotEmpty) {
+        _handleIncomingText(mediaFiles.first.path);
       }
       return;
     }
 
-    final name = file.path.split('/').last.split('\\').last;
+    final items = <SharedFileItem>[];
+    for (int i = 0; i < mediaFiles.length; i++) {
+      final file = mediaFiles[i];
+      if (file.path.trim().isEmpty) continue;
 
-    final payload = SharedFileItem(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      fileName: name.isNotEmpty ? name : 'shared_file_${DateTime.now().millisecondsSinceEpoch}',
-      filePath: file.path,
-      fileSizeBytes: 1024 * 512,
-      mimeType: file.type.name,
-      sharedAt: DateTime.now(),
-      category: SharedFileItem.detectCategory(name, file.type.name),
-    );
+      final name = file.path.split('/').last.split('\\').last;
+      int sizeBytes = 1024 * 512;
+      try {
+        final f = File(file.path);
+        if (f.existsSync()) {
+          sizeBytes = f.lengthSync();
+        }
+      } catch (_) {}
 
-    _latestPendingFile = payload;
-    _sharedPayloadController.add(payload);
+      items.add(
+        SharedFileItem(
+          id: '${DateTime.now().millisecondsSinceEpoch}_$i',
+          fileName: name.isNotEmpty ? name : 'shared_file_${DateTime.now().millisecondsSinceEpoch}_$i',
+          filePath: file.path,
+          fileSizeBytes: sizeBytes,
+          mimeType: file.type.name,
+          sharedAt: DateTime.now(),
+          category: SharedFileItem.detectCategory(name, file.type.name),
+        ),
+      );
+    }
+
+    if (items.isNotEmpty) {
+      _latestPendingFiles = items;
+      _sharedMultiplePayloadController.add(items);
+      _sharedPayloadController.add(items.first);
+    }
   }
 
   void _handleIncomingText(String text) {
-    // Automatically convert incoming shared text from AI assistants into a structured .md document
+    // Automatically convert incoming shared text into a structured .md document preserving all newlines
     final mdPayload = SharedFileItem.createMarkdownFromAiText(text: text);
-    _latestPendingFile = mdPayload;
+    _latestPendingFiles = [mdPayload];
+    _sharedMultiplePayloadController.add([mdPayload]);
     _sharedPayloadController.add(mdPayload);
   }
 
@@ -99,7 +142,8 @@ class ShareIntentService {
       note: note,
     );
 
-    _latestPendingFile = simulatedFile;
+    _latestPendingFiles = [simulatedFile];
+    _sharedMultiplePayloadController.add([simulatedFile]);
     _sharedPayloadController.add(simulatedFile);
   }
 
@@ -112,16 +156,22 @@ class ShareIntentService {
       text: markdownContent,
       customTitle: title,
     );
-    _latestPendingFile = mdPayload;
+    _latestPendingFiles = [mdPayload];
+    _sharedMultiplePayloadController.add([mdPayload]);
     _sharedPayloadController.add(mdPayload);
   }
 
   void clearPendingFile() {
-    _latestPendingFile = null;
+    _latestPendingFiles = [];
+  }
+
+  void clearPendingFiles() {
+    _latestPendingFiles = [];
   }
 
   void dispose() {
     _mediaIntentSub?.cancel();
     _sharedPayloadController.close();
+    _sharedMultiplePayloadController.close();
   }
 }

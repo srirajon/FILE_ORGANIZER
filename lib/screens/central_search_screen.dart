@@ -50,6 +50,7 @@ class _CentralSearchScreenState extends State<CentralSearchScreen> {
       for (final file in folder.files) {
         // Category filter check
         if (_selectedFilter == 'Docs') {
+          if (file.isTextNote) continue;
           if (file.category != FileCategory.document &&
               file.category != FileCategory.archive &&
               file.category != FileCategory.other) {
@@ -60,7 +61,7 @@ class _CentralSearchScreenState extends State<CentralSearchScreen> {
             continue;
           }
         } else if (_selectedFilter == 'Notes') {
-          if (!file.isMarkdown && file.category != FileCategory.markdown) {
+          if (!file.isMarkdown && file.category != FileCategory.markdown && !file.isTextNote) {
             continue;
           }
         } else if (_selectedFilter == 'Tags') {

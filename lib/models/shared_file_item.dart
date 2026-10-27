@@ -10,17 +10,17 @@ enum FileCategory {
 
 class SharedFileItem {
   final String id;
-  final String fileName;
+  String fileName;
   final String? filePath;
-  final int fileSizeBytes;
+  int fileSizeBytes;
   final String mimeType;
   final DateTime sharedAt;
   final FileCategory category;
-  final String? caption; // User-entered caption that enables future search; strictly no auto-generated text
-  final String? note; // Backward compatibility alias for caption
-  final List<String> tags; // User-defined tags (e.g. #receipt, #tax, #work)
+  String? caption; // User-entered caption that enables future search; strictly no auto-generated text
+  String? note; // Backward compatibility alias for caption
+  List<String> tags; // User-defined tags (e.g. #receipt, #tax, #work)
   bool isPinned;
-  final String? rawContent; // Text content for .md and text files
+  String? rawContent; // Text content for .md and text files
 
   SharedFileItem({
     required this.id,
@@ -42,10 +42,58 @@ class SharedFileItem {
       ? caption!.trim()
       : (note != null && note!.trim().isNotEmpty ? note!.trim() : null);
 
+  /// True if this item represents a text message/note rather than an external physical file
+  bool get isTextNote =>
+      (filePath == null || filePath!.isEmpty) &&
+      (mimeType == 'text/plain' ||
+       fileName == 'User Note' ||
+       (rawContent != null && rawContent!.isNotEmpty && !isMarkdown));
+
   bool get isMarkdown =>
       fileName.toLowerCase().endsWith('.md') ||
       mimeType == 'text/markdown' ||
       category == FileCategory.markdown;
+
+  /// Helper to normalize multiline text from Facebook, browsers, and mobile clipboards
+  static String formatMultilineText(String text) {
+    return text
+        .replaceAll('\r\n', '\n')
+        .replaceAll('\r', '\n')
+        .replaceAll('\u2028', '\n')
+        .replaceAll('\u2029', '\n\n')
+        .trim();
+  }
+
+  /// Update caption & note safely
+  void updateCaption(String? newCaption) {
+    final cleaned = (newCaption != null && newCaption.trim().isNotEmpty)
+        ? formatMultilineText(newCaption)
+        : null;
+    caption = cleaned;
+    note = cleaned;
+  }
+
+  /// Update tags
+  void updateTags(List<String> newTags) {
+    tags = List<String>.from(newTags);
+  }
+
+  /// Update raw text content and recompute file size
+  void updateRawContent(String newContent) {
+    final formatted = formatMultilineText(newContent);
+    rawContent = formatted;
+    fileSizeBytes = formatted.codeUnits.length;
+    // Keep caption in sync if this is a text note
+    if (isTextNote) {
+      note = formatted;
+      caption = formatted;
+      final lines = formatted.split('\n').where((l) => l.trim().isNotEmpty).toList();
+      if (lines.isNotEmpty) {
+        final firstLine = lines.first.trim();
+        fileName = firstLine.length <= 40 ? firstLine : '${firstLine.substring(0, 37)}...';
+      }
+    }
+  }
 
   String get formattedSize {
     if (fileSizeBytes < 1024) return '$fileSizeBytes B';
@@ -95,7 +143,7 @@ class SharedFileItem {
     String? caption,
     List<String> tags = const [],
   }) {
-    final trimmed = text.trim();
+    final trimmed = formatMultilineText(text);
     String docTitle;
 
     if (customTitle != null && customTitle.trim().isNotEmpty) {

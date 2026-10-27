@@ -57,4 +57,5 @@ android/keystores/debug.keystore
 Thumbs.db
 desktop.ini
 
-
+# apk files
+*.apk

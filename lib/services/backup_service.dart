@@ -28,11 +28,11 @@ class BackupService {
   DateTime? get lastGoogleDriveSync => _lastGoogleDriveSync;
 
   // Level 5 (v1.3): Explicit Google Account Selection
-  String _selectedGoogleAccount = 'srirajon';
+  String _selectedGoogleAccount = 'raisul.public@gmail.com';
   final List<String> _availableGoogleAccounts = [
-    'srirajon',
-    'raisul.hr@desco.org.bd',
-    'raisul.personal@gmail.com',
+    'raisul.public@gmail.com',
+    'raisul.public2@gmail.com',
+    'srirajon93@gmail.com',
   ];
 
   String get selectedGoogleAccount => _selectedGoogleAccount;

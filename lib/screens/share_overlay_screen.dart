@@ -9,16 +9,28 @@ import '../widgets/intercepted_file_card.dart';
 import 'folder_chat_screen.dart';
 
 class ShareOverlayScreen extends StatefulWidget {
-  final SharedFileItem initialFile;
+  final List<SharedFileItem> initialFiles;
   final List<FolderContact> folders;
   final VoidCallback onDismiss;
 
-  const ShareOverlayScreen({
+  ShareOverlayScreen({
     super.key,
-    required this.initialFile,
+    List<SharedFileItem>? initialFiles,
+    SharedFileItem? initialFile,
     required this.folders,
     required this.onDismiss,
-  });
+  }) : initialFiles = initialFiles ?? (initialFile != null ? [initialFile] : []);
+
+  SharedFileItem get initialFile => initialFiles.isNotEmpty
+      ? initialFiles.first
+      : SharedFileItem(
+          id: 'empty',
+          fileName: 'Shared File',
+          fileSizeBytes: 0,
+          mimeType: 'application/octet-stream',
+          sharedAt: DateTime.now(),
+          category: FileCategory.other,
+        );
 
   @override
   State<ShareOverlayScreen> createState() => _ShareOverlayScreenState();
@@ -49,12 +61,14 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
       curve: Curves.easeOutBack,
     );
 
-    // If initialFile already had a caption or tags (e.g. forwarded or markdown)
-    if (widget.initialFile.caption != null) {
-      _captionController.text = widget.initialFile.caption!;
-    }
-    if (widget.initialFile.tags.isNotEmpty) {
-      _tags.addAll(widget.initialFile.tags);
+    // If initial files already had captions or tags (e.g. forwarded or markdown)
+    for (final f in widget.initialFiles) {
+      if (f.caption != null && f.caption!.isNotEmpty && _captionController.text.isEmpty) {
+        _captionController.text = f.caption!;
+      }
+      for (final t in f.tags) {
+        if (!_tags.contains(t)) _tags.add(t);
+      }
     }
   }
 
@@ -102,40 +116,46 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
     await Future.delayed(const Duration(milliseconds: 350));
 
     final customCaption = _captionController.text.trim().isNotEmpty
-        ? _captionController.text.trim()
+        ? SharedFileItem.formatMultilineText(_captionController.text.trim())
         : null;
 
-    // Persist physical file / Markdown note into public phone vault:
-    // Internal Storage > Download > FileOrganizer > [FolderName] > [FileName]
-    String persistedPath = widget.initialFile.filePath ?? '';
-    try {
-      persistedPath = await BackupService().persistFileToFolder(
-        folderName: _selectedFolder!.name,
-        fileName: widget.initialFile.fileName,
-        sourcePath: widget.initialFile.filePath,
-        rawContent: widget.initialFile.rawContent,
-      );
-    } catch (_) {}
+    final cleanFiles = <SharedFileItem>[];
 
-    // File with user caption and tags; strictly no auto-text
-    final cleanFile = SharedFileItem(
-      id: widget.initialFile.id,
-      fileName: widget.initialFile.fileName,
-      filePath: persistedPath.isNotEmpty ? persistedPath : widget.initialFile.filePath,
-      fileSizeBytes: widget.initialFile.fileSizeBytes,
-      mimeType: widget.initialFile.mimeType,
-      sharedAt: DateTime.now(),
-      category: widget.initialFile.category,
-      caption: customCaption,
-      note: customCaption,
-      tags: List<String>.from(_tags),
-      rawContent: widget.initialFile.rawContent,
-      isPinned: false,
-    );
+    for (int i = 0; i < widget.initialFiles.length; i++) {
+      final sourceFile = widget.initialFiles[i];
+      // Persist physical file / Markdown note into public phone vault:
+      // Internal Storage > Download > FileOrganizer > [FolderName] > [FileName]
+      String persistedPath = sourceFile.filePath ?? '';
+      try {
+        persistedPath = await BackupService().persistFileToFolder(
+          folderName: _selectedFolder!.name,
+          fileName: sourceFile.fileName,
+          sourcePath: sourceFile.filePath,
+          rawContent: sourceFile.rawContent,
+        );
+      } catch (_) {}
+
+      cleanFiles.add(
+        SharedFileItem(
+          id: '${DateTime.now().millisecondsSinceEpoch}_$i',
+          fileName: sourceFile.fileName,
+          filePath: persistedPath.isNotEmpty ? persistedPath : sourceFile.filePath,
+          fileSizeBytes: sourceFile.fileSizeBytes,
+          mimeType: sourceFile.mimeType,
+          sharedAt: DateTime.now(),
+          category: sourceFile.category,
+          caption: customCaption,
+          note: customCaption,
+          tags: List<String>.from(_tags),
+          rawContent: sourceFile.rawContent,
+          isPinned: false,
+        ),
+      );
+    }
 
     setState(() {
-      _selectedFolder!.files.insert(0, cleanFile);
-      _selectedFolder!.unreadOrNewCount += 1;
+      _selectedFolder!.files.insertAll(0, cleanFiles);
+      _selectedFolder!.unreadOrNewCount += cleanFiles.length;
       _selectedFolder!.lastTimestamp = 'Just now';
     });
 
@@ -143,6 +163,10 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
     await _configService.saveFolders();
 
     if (!mounted) return;
+
+    final msg = cleanFiles.length == 1
+        ? 'File sorted into "${_selectedFolder!.name}"'
+        : '${cleanFiles.length} files sorted into "${_selectedFolder!.name}"';
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -155,7 +179,7 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'File sorted into "${_selectedFolder!.name}"',
+                msg,
                 style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
               ),
             ),
@@ -305,7 +329,9 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
                     );
 
                     setState(() {
-                      widget.folders.insert(0, created);
+                      if (!widget.folders.contains(created)) {
+                        widget.folders.insert(0, created);
+                      }
                       _selectedFolder = created;
                       _sendAnimController.forward();
                     });
@@ -362,11 +388,109 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
         children: [
           Column(
             children: [
-              // Intercepted File Preview Bar
-              InterceptedFileCard(
-                file: widget.initialFile,
-                onDismiss: widget.onDismiss,
-              ),
+              // Intercepted File Preview Bar: Single file or Multi-file carousel
+              if (widget.initialFiles.length <= 1)
+                InterceptedFileCard(
+                  file: widget.initialFile,
+                  onDismiss: widget.onDismiss,
+                )
+              else
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E2A32) : const Color(0xFFF0F2F5),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: WhatsAppTheme.accentGreen.withValues(alpha: 0.35),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: WhatsAppTheme.accentGreen.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '${widget.initialFiles.length} FILES SELECTED',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: WhatsAppTheme.accentGreen,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatTotalSize(widget.initialFiles),
+                            style: const TextStyle(fontSize: 11.5, color: WhatsAppTheme.darkTextSecondary),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 18),
+                            color: WhatsAppTheme.darkTextSecondary,
+                            onPressed: widget.onDismiss,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            tooltip: 'Cancel share',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 38,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: widget.initialFiles.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          itemBuilder: (context, i) {
+                            final f = widget.initialFiles[i];
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF2A3942) : Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF374248) : const Color(0xFFE0E0E0),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(_getFileIcon(f.category), size: 16, color: WhatsAppTheme.accentGreen),
+                                  const SizedBox(width: 6),
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 130),
+                                    child: Text(
+                                      f.fileName,
+                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
               // Level 5 (v1.3): Tagging & Caption Card
               Container(
@@ -376,16 +500,20 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
                   color: isDark ? const Color(0xFF1E2A32) : const Color(0xFFF7F9FA),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: WhatsAppTheme.accentGreen.withOpacity(0.3),
+                    color: WhatsAppTheme.accentGreen.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Caption Field (Enables Future Search)
+                    // Caption Field (Enables Future Search, preserves newlines)
                     TextField(
                       controller: _captionController,
+                      keyboardType: TextInputType.multiline,
+                      minLines: 1,
+                      maxLines: 4,
+                      textInputAction: TextInputAction.newline,
                       style: TextStyle(
                         fontSize: 13.5,
                         color: isDark ? WhatsAppTheme.darkTextPrimary : const Color(0xFF111B21),
@@ -632,5 +760,34 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> with SingleTick
         ],
       ),
     );
+  }
+
+  String _formatTotalSize(List<SharedFileItem> files) {
+    int total = 0;
+    for (final f in files) {
+      total += f.fileSizeBytes;
+    }
+    if (total < 1024) return '$total B';
+    if (total < 1024 * 1024) return '${(total / 1024).toStringAsFixed(1)} KB';
+    return '${(total / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  IconData _getFileIcon(FileCategory category) {
+    switch (category) {
+      case FileCategory.markdown:
+        return Icons.article_rounded;
+      case FileCategory.document:
+        return Icons.picture_as_pdf_rounded;
+      case FileCategory.image:
+        return Icons.photo_library_rounded;
+      case FileCategory.video:
+        return Icons.videocam_rounded;
+      case FileCategory.audio:
+        return Icons.mic_rounded;
+      case FileCategory.archive:
+        return Icons.folder_zip_rounded;
+      default:
+        return Icons.insert_drive_file_rounded;
+    }
   }
 }
