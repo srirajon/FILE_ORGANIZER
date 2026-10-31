@@ -1,0 +1,145 @@
+[
+  {
+    "id": "work_docs",
+    "name": "Work Documents",
+    "description": "Quarterly reports, NDA agreements & contracts",
+    "avatarEmoji": "💼",
+    "avatarBgColor": "ff1e88e5",
+    "lastTimestamp": "11:42 AM",
+    "unreadOrNewCount": 0,
+    "files": [
+      {
+        "id": "f1",
+        "fileName": "Q3_Financial_Analysis.pdf",
+        "fileSizeBytes": 2450000,
+        "mimeType": "application/pdf",
+        "sharedAt": "2026-10-23T10:55:00.000",
+        "category": "document"
+      },
+      {
+        "id": "f2",
+        "fileName": "Vendor_Contract_DESCO.pdf",
+        "fileSizeBytes": 1200000,
+        "mimeType": "application/pdf",
+        "sharedAt": "2026-10-23T08:40:00.000",
+        "category": "document"
+      },
+      {
+        "id": "f3",
+        "fileName": "Team_Sprint_Goals.docx",
+        "fileSizeBytes": 450000,
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "sharedAt": "2026-10-22T14:10:00.000",
+        "category": "document"
+      }
+    ]
+  },
+  {
+    "id": "receipts",
+    "name": "Receipts & Invoices",
+    "description": "Tax deductions, utility bills & shopping receipts",
+    "avatarEmoji": "🧾",
+    "avatarBgColor": "ff43a047",
+    "lastTimestamp": "Yesterday",
+    "unreadOrNewCount": 0,
+    "files": [
+      {
+        "id": "f4",
+        "fileName": "Grocery_Store_TaxInvoice.jpg",
+        "fileSizeBytes": 850000,
+        "mimeType": "image/jpeg",
+        "sharedAt": "2026-10-22T11:20:00.000",
+        "category": "image"
+      },
+      {
+        "id": "f5",
+        "fileName": "Electricity_Bill_Oct2026.pdf",
+        "fileSizeBytes": 310000,
+        "mimeType": "application/pdf",
+        "sharedAt": "2026-10-21T09:15:00.000",
+        "category": "document"
+      }
+    ]
+  },
+  {
+    "id": "family_photos",
+    "name": "Family Photos",
+    "description": "Vacation memories, birthdays & family weekend",
+    "avatarEmoji": "📸",
+    "avatarBgColor": "ffe53935",
+    "lastTimestamp": "Tuesday",
+    "unreadOrNewCount": 0,
+    "files": [
+      {
+        "id": "f6",
+        "fileName": "Beach_Sunset_2026.jpg",
+        "fileSizeBytes": 3800000,
+        "mimeType": "image/jpeg",
+        "sharedAt": "2026-10-20T17:30:00.000",
+        "category": "image"
+      },
+      {
+        "id": "f7",
+        "fileName": "Kids_Graduation.mp4",
+        "fileSizeBytes": 14500000,
+        "mimeType": "video/mp4",
+        "sharedAt": "2026-10-18T12:00:00.000",
+        "category": "video"
+      }
+    ]
+  },
+  {
+    "id": "ideas_notes",
+    "name": "Ideas & Notes",
+    "description": "Quick voice memos, whiteboard sketches & clips",
+    "avatarEmoji": "💡",
+    "avatarBgColor": "fffb8c00",
+    "lastTimestamp": "Sunday",
+    "unreadOrNewCount": 0,
+    "files": [
+      {
+        "id": "f8",
+        "fileName": "App_Architecture_Diagram.png",
+        "fileSizeBytes": 1400000,
+        "mimeType": "image/png",
+        "sharedAt": "2026-10-19T15:45:00.000",
+        "category": "image"
+      },
+      {
+        "id": "f9",
+        "fileName": "Voice_Note_003.m4a",
+        "fileSizeBytes": 890000,
+        "mimeType": "audio/mp4",
+        "sharedAt": "2026-10-17T20:10:00.000",
+        "category": "audio"
+      }
+    ]
+  },
+  {
+    "id": "medical",
+    "name": "Medical & Health",
+    "description": "Doctor prescriptions, blood tests & health insurance",
+    "avatarEmoji": "🏥",
+    "avatarBgColor": "ff8e24aa",
+    "lastTimestamp": "10/12/26",
+    "unreadOrNewCount": 0,
+    "files": [
+      {
+        "id": "f10",
+        "fileName": "Annual_Checkup_Lab_Results.pdf",
+        "fileSizeBytes": 980000,
+        "mimeType": "application/pdf",
+        "sharedAt": "2026-10-12T09:00:00.000",
+        "category": "document"
+      },
+      {
+        "id": "f11",
+        "fileName": "Health_Insurance_Policy.pdf",
+        "fileSizeBytes": 1850000,
+        "mimeType": "application/pdf",
+        "sharedAt": "2026-09-28T14:20:00.000",
+        "category": "document"
+      }
+    ]
+  }
+]
